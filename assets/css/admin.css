@@ -1,0 +1,177 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5efe6;
+  color: #3e2c23;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  background-color: #6b4f3b;
+  color: #fff8f0;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2rem;
+}
+
+/* Main */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Sections */
+section {
+  background-color: #fffaf3;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(107, 79, 59, 0.15);
+}
+
+h2, h3 {
+  margin-bottom: 15px;
+  color: #6b4f3b;
+}
+
+/* Forms */
+form {
+  margin-top: 15px;
+}
+
+fieldset {
+  border: 1px solid #d6c2b0;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+legend {
+  font-weight: bold;
+  color: #6b4f3b;
+  padding: 0 8px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+input,
+select {
+  border: 1px solid #d6c2b0;
+  background-color: #fff;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 4px rgba(166, 124, 82, 0.4);
+}
+
+/* Buttons */
+button {
+  margin-top: 15px;
+  border: none;
+  background-color: #8b5e3c;
+  color: #fffaf3;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #6b4f3b;
+}
+
+/* Details */
+details {
+  margin-top: 10px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #8b5e3c;
+  margin-bottom: 10px;
+}
+
+/* Search */
+#search-input {
+  margin-bottom: 15px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+thead {
+  background-color: #6b4f3b;
+  color: #fffaf3;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0d3c2;
+}
+
+th {
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background-color: #f2e6d9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  section {
+    padding: 15px;
+  }
+
+  th,
+  td {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
