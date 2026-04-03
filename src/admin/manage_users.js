@@ -41,20 +41,35 @@ const tableHeaders = document.querySelectorAll("#user-table thead th");
  *    - A "Delete" button with class "delete-btn" and a data-id attribute set to the user's id.
  */
 function createUserRow(user) {
-const tr = document.createElement("tr");
+  const tr = document.createElement("tr");
+  const nameTd = document.createElement("td");
+  nameTd.textContent = user.name;
+  
+  const adminTd = document.createElement("td");
+  adminTd.textContent = user.is_admin === 1 ? "Yes" : "No";
+  
+  const actionsTd = document.createElement("td");
 
-  tr.innerHTML = `
-    <td>${user.name}</td>
-    <td>${user.email}</td>
-    <td>${user.is_admin === 1 ? "Yes" : "No"}</td>
-    <td>
-      <button class="edit-btn" data-id="${user.id}">Edit</button>
-      <button class="delete-btn" data-id="${user.id}">Delete</button>
-    </td>
-  `;
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.classList.add("edit-btn");
+  editBtn.setAttribute("data-id", user.id);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.classList.add("delete-btn");
+  deleteBtn.setAttribute("data-id", user.id);
+
+  actionsTd.appendChild(editBtn);
+  actionsTd.appendChild(deleteBtn);
+
+  tr.appendChild(nameTd);
+  tr.appendChild(emailTd);
+  tr.appendChild(adminTd);
+  tr.appendChild(actionsTd);
 
   return tr;
-  }
+}
 
 /**
  * TODO: Implement the renderTable function.
@@ -66,11 +81,11 @@ const tr = document.createElement("tr");
  */
 function renderTable(userArray) {
   userTableBody.innerHTML = "";
-
-  userArray.forEach(user => {
+    userArray.forEach(user => {
     const row = createUserRow(user);
     userTableBody.appendChild(row);
   });
+
 }
 
 /**
@@ -92,9 +107,9 @@ function handleChangePassword(event) {
 
   event.preventDefault();
 
-  const currentPassword = document.getElementById("current-password").value;
-  const newPassword = document.getElementById("new-password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
+  const currentPassword = document.getElementById("current-password").value.trim();
+  const newPassword = document.getElementById("new-password").value.trim();
+  const confirmPassword = document.getElementById("confirm-password").value.trim();
 
   if (newPassword !== confirmPassword) {
     alert("Passwords do not match.");
@@ -106,32 +121,35 @@ function handleChangePassword(event) {
     return;
   }
 
-  fetch('../api/index.php?action=change_password', {
-    method: 'POST',
+  const id = 1; // مؤقت
+
+  fetch("../api/index.php?action=change_password", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      id: 1, 
+      id: id,
       current_password: currentPassword,
       new_password: newPassword
     })
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert("Password updated successfully!");
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        alert("Password updated successfully!");
 
-      document.getElementById("current-password").value = "";
-      document.getElementById("new-password").value = "";
-      document.getElementById("confirm-password").value = "";
-    } else {
-      alert(data.message);
-    }
-  })
-  .catch(error => {
-    alert("Error updating password.");
-  });
+        document.getElementById("current-password").value = "";
+        document.getElementById("new-password").value = "";
+        document.getElementById("confirm-password").value = "";
+      } else {
+        alert(result.message);
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Something went wrong.");
+    });
 }
 
 /**
@@ -151,7 +169,6 @@ function handleChangePassword(event) {
  * 7. On failure, show the error message returned by the API.
  */
 function handleAddUser(event) {
-
   event.preventDefault();
 
   const name = document.getElementById("user-name").value.trim();
@@ -159,7 +176,6 @@ function handleAddUser(event) {
   const password = document.getElementById("default-password").value.trim();
   const isAdmin = document.getElementById("is-admin").value;
 
-  // Validation
   if (!name || !email || !password) {
     alert("Please fill out all required fields.");
     return;
@@ -179,28 +195,29 @@ function handleAddUser(event) {
       name: name,
       email: email,
       password: password,
-      is_admin: isAdmin
+      is_admin: Number(isAdmin)
     })
   })
     .then(response =>
-      response.json().then(data => ({ status: response.status, data: data }))
+      response.json().then(result => ({
+        status: response.status,
+        body: result
+      }))
     )
-    .then(result => {
-      if (result.status === 201) {
+    .then(data => {
+
+      if (data.status === 201 && data.body.success) {
         loadUsersAndInitialize();
 
-        document.getElementById("user-name").value = "";
-        document.getElementById("user-email").value = "";
-        document.getElementById("default-password").value = "";
-        document.getElementById("is-admin").value = "0";
+        addUserForm.reset();
       } else {
-        alert(result.data.message);
+        alert(data.body.message);
       }
     })
     .catch(error => {
-      alert("Failed to add user.");
-    });
-  }
+      console.error("Error adding user:", error);
+      alert("Something went wrong.");
+    });}
 
 /**
  * TODO: Implement the handleTableClick function.
@@ -218,32 +235,72 @@ function handleAddUser(event) {
  *      and send a PUT request to '../api/index.php' with the updated fields.
  */
 function handleTableClick(event) {
+ const target = event.target;
 
-  if (event.target.classList.contains("delete-btn")) {
-    const id = event.target.dataset.id;
+  // delete
+  if (target.classList.contains("delete-btn")) {
+    const id = target.dataset.id;
 
     fetch("../api/index.php?id=" + id, {
       method: "DELETE"
     })
-      .then(response =>
-        response.json().then(data => ({ status: response.status, data: data }))
-      )
+      .then(response => response.json())
       .then(result => {
-        if (result.status === 200) {
-          users = users.filter(user => user.id != id);
+        if (result.success) {
+          users = users.filter(user => String(user.id) !== String(id));
           renderTable(users);
         } else {
-          alert(result.data.message);
+          alert(result.message);
         }
       })
       .catch(error => {
-        alert("Failed to delete user.");
+        console.error("Error deleting user:", error);
+        alert("Something went wrong.");
       });
   }
 
-  if (event.target.classList.contains("edit-btn")) {
-    const id = event.target.dataset.id;
+  // edit
+  if (target.classList.contains("edit-btn")) {
+    const id = target.dataset.id;
+    const user = users.find(user => String(user.id) === String(id));
 
+    if (!user) {
+      alert("User not found.");
+      return;
+    }
+
+    const updatedName = prompt("Enter new name:", user.name);
+    const updatedEmail = prompt("Enter new email:", user.email);
+    const updatedIsAdmin = prompt("Enter admin status (1 for Admin, 0 for Student):", user.is_admin);
+
+    if (updatedName === null || updatedEmail === null || updatedIsAdmin === null) {
+      return;
+    }
+
+    fetch("../api/index.php", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: Number(id),
+        name: updatedName.trim(),
+        email: updatedEmail.trim(),
+        is_admin: Number(updatedIsAdmin)
+      })
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          loadUsersAndInitialize();
+        } else {
+          alert(result.message);
+        }
+      })
+      .catch(error => {
+        console.error("Error updating user:", error);
+        alert("Something went wrong.");
+      });
   }
 }
 
@@ -259,17 +316,19 @@ function handleTableClick(event) {
  *    (This filters the client-side cache only; no extra API call is needed.)
  */
 function handleSearch(event) {
-const searchTerm = event.target.value.toLowerCase();
+  const searchTerm = searchInput.value.toLowerCase();
 
   if (!searchTerm) {
     renderTable(users);
     return;
   }
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm) ||
-    user.email.toLowerCase().includes(searchTerm)
-  );
+  const filteredUsers = users.filter(user => {
+    return (
+      user.name.toLowerCase().includes(searchTerm) ||
+      user.email.toLowerCase().includes(searchTerm)
+    );
+  });
 
   renderTable(filteredUsers);}
 
@@ -291,31 +350,29 @@ const searchTerm = event.target.value.toLowerCase();
  * 6. Call renderTable(users) to update the view.
  */
 function handleSort(event) {
-const th = event.currentTarget;
+  const th = event.currentTarget;
+
   const index = th.cellIndex;
 
   let key;
   if (index === 0) key = "name";
   else if (index === 1) key = "email";
   else if (index === 2) key = "is_admin";
-  else return;
+  else return; 
 
-  let dir = th.getAttribute("data-sort-dir") === "asc" ? "desc" : "asc";
-  th.setAttribute("data-sort-dir", dir);
+  let direction = th.getAttribute("data-sort-dir") === "asc" ? "desc" : "asc";
+  th.setAttribute("data-sort-dir", direction);
 
   users.sort((a, b) => {
-    let valA = a[key];
-    let valB = b[key];
+    let result;
 
     if (key === "name" || key === "email") {
-      return dir === "asc"
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
+      result = a[key].localeCompare(b[key]);
     } else {
-      return dir === "asc"
-        ? valA - valB
-        : valB - valA;
+      result = a[key] - b[key];
     }
+
+    return direction === "asc" ? result : -result;
   });
 
   renderTable(users);
@@ -339,11 +396,11 @@ const th = event.currentTarget;
  *    - "click"  on each th in tableHeaders -> handleSort
  */
 async function loadUsersAndInitialize() {
-try {
+ try {
     const response = await fetch("../api/index.php");
 
     if (!response.ok) {
-      console.error("Failed to load users.");
+      console.error("Failed to fetch users:", response.statusText);
       alert("Failed to load users.");
       return;
     }
@@ -354,16 +411,20 @@ try {
 
     renderTable(users);
 
-    changePasswordForm.addEventListener("submit", handleChangePassword, { once: true });
-    addUserForm.addEventListener("submit", handleAddUser, { once: true });
-    userTableBody.addEventListener("click", handleTableClick, { once: true });
-    searchInput.addEventListener("input", handleSearch, { once: true });
+    if (!loadUsersAndInitialize.initialized) {
+      passwordForm.addEventListener("submit", handleChangePassword);
+      addUserForm.addEventListener("submit", handleAddUser);
+      userTableBody.addEventListener("click", handleTableClick);
+      searchInput.addEventListener("input", handleSearch);
 
-    tableHeaders.forEach(th => {
-      th.addEventListener("click", handleSort, { once: true });
-    });
+      tableHeaders.forEach(th => {
+        th.addEventListener("click", handleSort);
+      });
+
+      loadUsersAndInitialize.initialized = true;
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error loading users:", error);
     alert("Failed to load users.");
   }
 }
