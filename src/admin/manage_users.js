@@ -42,12 +42,16 @@ const tableHeaders = document.querySelectorAll("#user-table thead th");
  */
 function createUserRow(user) {
   const tr = document.createElement("tr");
+
   const nameTd = document.createElement("td");
   nameTd.textContent = user.name;
-  
+
+  const emailTd = document.createElement("td");
+  emailTd.textContent = user.email;
+
   const adminTd = document.createElement("td");
   adminTd.textContent = user.is_admin === 1 ? "Yes" : "No";
-  
+
   const actionsTd = document.createElement("td");
 
   const editBtn = document.createElement("button");
@@ -104,12 +108,15 @@ function renderTable(userArray) {
  * 6. On failure, show the error message returned by the API.
  */
 function handleChangePassword(event) {
-
   event.preventDefault();
 
-  const currentPassword = document.getElementById("current-password").value.trim();
-  const newPassword = document.getElementById("new-password").value.trim();
-  const confirmPassword = document.getElementById("confirm-password").value.trim();
+  const currentPasswordInput = document.getElementById("current-password");
+  const newPasswordInput = document.getElementById("new-password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+
+  const currentPassword = currentPasswordInput.value.trim();
+  const newPassword = newPasswordInput.value.trim();
+  const confirmPassword = confirmPasswordInput.value.trim();
 
   if (newPassword !== confirmPassword) {
     alert("Passwords do not match.");
@@ -121,15 +128,13 @@ function handleChangePassword(event) {
     return;
   }
 
-  const id = 1; // مؤقت
-
   fetch("../api/index.php?action=change_password", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      id: id,
+      id: 1,
       current_password: currentPassword,
       new_password: newPassword
     })
@@ -138,18 +143,17 @@ function handleChangePassword(event) {
     .then(result => {
       if (result.success) {
         alert("Password updated successfully!");
-
-        document.getElementById("current-password").value = "";
-        document.getElementById("new-password").value = "";
-        document.getElementById("confirm-password").value = "";
       } else {
         alert(result.message);
       }
     })
     .catch(error => {
       console.error("Error:", error);
-      alert("Something went wrong.");
     });
+
+  currentPasswordInput.value = "";
+  newPasswordInput.value = "";
+  confirmPasswordInput.value = "";
 }
 
 /**
