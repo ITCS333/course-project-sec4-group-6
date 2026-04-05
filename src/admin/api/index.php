@@ -46,9 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // TODO: Include the database connection file.
 // Assume a function getDBConnection() is available that returns a PDO instance
-require_once '../db.php';
+//require_once '../db.php';
 
-$pdo = getDBConnection();
+$db = getDBConnection();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
