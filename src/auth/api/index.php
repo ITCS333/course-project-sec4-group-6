@@ -1,11 +1,4 @@
 <?php
-/**
- * Authentication Handler for Login Form
- * 
- * This PHP script handles user authentication via POST requests from the Fetch API.
- * It validates credentials against a MySQL database using PDO,
- * creates sessions, and returns JSON responses.
- */
 
 session_start();
 
