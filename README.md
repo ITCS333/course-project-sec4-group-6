@@ -24,7 +24,7 @@ The website covers five functional areas, each assigned to one team member.
 | 1 | Home Page, Authentication & User Management |202004852 |Sh973 |
 | 2 | Course Resources | | |
 | 3 | Weekly Breakdown | | |
-| 4 | Assignments | | |
+| 4 | Assignments | 202004639 | FatemaMh |
 | 5 | Discussion Board | | |
 
 ---
@@ -66,7 +66,7 @@ All seed users share the password **`password`**.
 | Role | Email |
 |------|-------|
 | Admin | `admin@uob.edu.bh` |
-| Student | `202101234@stu.uob.edu.bh` |
+| Student | `202004639@stu.uob.edu.bh` ,`` |
 
 ---
 
