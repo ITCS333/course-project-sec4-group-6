@@ -10,50 +10,55 @@
 <html lang="en">
 <head>
     <!-- TODO: Add the <meta> tag for character encoding (UTF-8). -->
-
+      <meta charset="utf-8">
     <!-- TODO: Add the responsive viewport <meta> tag
          (width=device-width, initial-scale=1.0). -->
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- TODO: Add a <title>, e.g., "Manage Assignments". -->
-
+    <title>Manage Assignments</title>
     <!-- TODO: Link to your CSS framework or stylesheet. -->
-
+    <link rel="stylesheet" href="../../assets/css/Assignment.css">
     <!-- Required: link admin.js with defer. -->
     <script src="admin.js" defer></script>
 </head>
 <body>
 
     <!-- TODO: Create a <header> containing an <h1> "Manage Assignments". -->
-
+    <header> <h1>Manage Assignments</h1> </header>
     <!-- TODO: Create the <main> content area. -->
-
+    <main>
         <!-- ============================================================
              Section 1: Add / Edit Assignment Form
              ============================================================ -->
         <!-- TODO: Create a <section> for the form. -->
-
+        <section>
             <!-- TODO: Add a sub-heading <h2> "Add a New Assignment". -->
-
+            <h2>Add a New Assignment</h2>
             <!-- TODO: Create a <form id="assignment-form"> (action can be "#").
                  The id is required by admin.js. -->
-
+            <form id="assignment-form" action="#">
                 <!-- TODO: Use a <fieldset> to group the form controls. -->
+                <fieldset>
                     <!-- TODO: Add a <legend>, e.g., "Assignment Details". -->
-
+                    <legend>Assignment Details</legend>
                     <!-- TODO: Add a <label> and <input> for the assignment title.
                          - label for="assignment-title"
                          - input id="assignment-title", type="text", required -->
+                    <label for="assignment-title" >Assignment Title</label>
+                    <input type="text" id="assignment-title" name="assignment-title" required >
 
                     <!-- TODO: Add a <label> and <textarea> for the description.
                          - label for="assignment-description"
                          - textarea id="assignment-description", rows="5", required
                          - Maps to the description column in the assignments table. -->
-
+                    <label for="assignment-description">Description</label>
+                    <textarea id="assignment-description" name="assignment-description" rows="5" required></textarea>
                     <!-- TODO: Add a <label> and <input> for the due date.
                          - label for="assignment-due-date"
                          - input id="assignment-due-date", type="date", required
                          - Maps to the due_date column in the assignments table. -->
-
+                    <label for="assignment-due-date">Due Date</label>
+                    <input type="date" id="assignment-due-date" name="assignment-due-date" required >
                     <!-- TODO: Add a <label> and <textarea> for attached file URLs
                          (one URL per line).
                          - label for="assignment-files"
@@ -61,17 +66,21 @@
                          - Maps to the files column (JSON array) in the
                            assignments table. admin.js will split the textarea
                            value on newlines and send it as an array. -->
-
+                    <label for="assignment-files">Attached File URLs</label>
+                    <textarea id="assignment-files" name="assignment-files" rows="3"></textarea>
                     <!-- TODO: Add a submit <button>.
                          - id="add-assignment", type="submit"
                          - Text: "Add Assignment"
                          - When the form is in edit mode, admin.js will
                            change the button text to "Update Assignment" and
                            store the id being edited in a data attribute. -->
+                   <button id="add-assignment" type="submit" > Add Assignment </button>
                 <!-- End of <fieldset> -->
+                </fieldset>
             <!-- End of <form> -->
+            </form>
         <!-- End of form <section> -->
-
+        </section>
 
         <!-- ============================================================
              Section 2: Existing Assignments Table
