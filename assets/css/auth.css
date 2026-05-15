@@ -1,0 +1,119 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5efe6;
+  color: #3e2c23;
+  line-height: 1.6;
+
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+}
+
+/* Main Card */
+section {
+  background-color: #fffaf3;
+  width: 350px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(107, 79, 59, 0.15);
+}
+
+/* Headings */
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #6b4f3b;
+}
+
+/* Form */
+form {
+  margin-top: 10px;
+}
+
+fieldset {
+  border: 1px solid #d6c2b0;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+legend {
+  font-weight: bold;
+  color: #6b4f3b;
+  padding: 0 8px;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: 1px solid #d6c2b0;
+  background-color: #fff;
+}
+
+input:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 4px rgba(166, 124, 82, 0.4);
+}
+
+/* Button */
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #8b5e3c;
+  color: #fffaf3;
+
+  font-size: 1rem;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #6b4f3b;
+}
+
+/* Message Container */
+#message-container {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  section {
+    width: 100%;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
