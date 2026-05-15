@@ -1,42 +1,8 @@
-/*
-  Requirement: Make the "Manage Assignments" page interactive.
-
-  Instructions:
-  1. This file is already linked to `admin.html` via:
-         <script src="admin.js" defer></script>
-
-  2. In `admin.html`:
-     - The form has id="assignment-form".
-     - The submit button has id="add-assignment".
-     - The <tbody> has id="assignments-tbody".
-     - Columns rendered per row:
-       Title | Due Date | Description | Actions.
-
-  3. Implement the TODOs below.
-
-  API base URL: ./api/index.php
-  All requests and responses use JSON.
-  Successful list response shape: { success: true, data: [ ...assignment objects ] }
-  Each assignment object shape:
-    {
-      id:          number,   // integer primary key from the assignments table
-      title:       string,
-      due_date:    string,   // "YYYY-MM-DD" — matches the SQL column name
-      description: string,
-      files:       string[]  // decoded array of URL strings
-    }
-*/
-
-// --- Global Data Store ---
-// Holds the assignments currently displayed in the table.
 let assignments = [];
 
-// --- Element Selections ---
 const form = document.getElementById("assignment-form");
 const tbody = document.getElementById("assignments-tbody");
 const submitBtn = document.getElementById("add-assignment");
-
-// --- Functions ---
 
 function createAssignmentRow(assignment) {
   const tr = document.createElement("tr");
@@ -56,7 +22,6 @@ function createAssignmentRow(assignment) {
 
 function renderTable() {
   tbody.innerHTML = "";
-
   assignments.forEach((assignment) => {
     const row = createAssignmentRow(assignment);
     tbody.appendChild(row);
@@ -139,7 +104,6 @@ async function handleUpdateAssignment(id, fields) {
 async function handleTableClick(event) {
   const target = event.target;
 
-  
   if (target.classList.contains("delete-btn")) {
     const id = parseInt(target.dataset.id);
 
@@ -155,33 +119,40 @@ async function handleTableClick(event) {
     }
   }
 
-  
   if (target.classList.contains("edit-btn")) {
     const id = parseInt(target.dataset.id);
     const assignment = assignments.find(a => a.id === id);
 
-    document.getElementById("assignment-title").value = assignment.title;
-    document.getElementById("assignment-due-date").value = assignment.due_date;
-    document.getElementById("assignment-description").value = assignment.description;
-    document.getElementById("assignment-files").value = assignment.files.join("\n");
+    if (assignment) {
+      document.getElementById("assignment-title").value = assignment.title;
+      document.getElementById("assignment-due-date").value = assignment.due_date;
+      document.getElementById("assignment-description").value = assignment.description;
+      document.getElementById("assignment-files").value = (assignment.files || []).join("\n");
 
-    submitBtn.textContent = "Update Assignment";
-    submitBtn.dataset.editId = id;
+      submitBtn.textContent = "Update Assignment";
+      submitBtn.dataset.editId = id;
+    }
   }
 }
 
 async function loadAndInitialize() {
-  const response = await fetch("./api/index.php");
-  const result = await response.json();
+  try {
+    const response = await fetch("./api/index.php");
+    const result = await response.json();
 
-  if (result.success) {
-    assignments = result.data;
-    renderTable();
+    if (result.success) {
+      assignments = result.data.map(a => ({
+        ...a,
+        files: a.files || []
+      }));
+      renderTable();
+    }
+  } catch (error) {
+    console.error(error);
   }
 
   form.addEventListener("submit", handleAddAssignment);
   tbody.addEventListener("click", handleTableClick);
 }
 
-// --- Initial Page Load ---
 loadAndInitialize();
