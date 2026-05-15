@@ -6,7 +6,6 @@ const submitBtn = document.getElementById("add-assignment");
 
 function createAssignmentRow(assignment) {
   const tr = document.createElement("tr");
-
   tr.innerHTML = `
     <td>${assignment.title}</td>
     <td>${assignment.due_date}</td>
@@ -16,7 +15,6 @@ function createAssignmentRow(assignment) {
       <button class="delete-btn" data-id="${assignment.id}">Delete</button>
     </td>
   `;
-
   return tr;
 }
 
@@ -34,8 +32,8 @@ async function handleAddAssignment(event) {
   const title = document.getElementById("assignment-title").value;
   const due_date = document.getElementById("assignment-due-date").value;
   const description = document.getElementById("assignment-description").value;
-
   const filesText = document.getElementById("assignment-files").value;
+  
   const files = filesText
     .split("\n")
     .map(f => f.trim())
@@ -55,23 +53,14 @@ async function handleAddAssignment(event) {
 
   const response = await fetch("./api/index.php", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title, due_date, description, files })
   });
 
   const result = await response.json();
 
   if (result.success) {
-    assignments.push({
-      id: result.id,
-      title,
-      due_date,
-      description,
-      files
-    });
-
+    assignments.push({ id: result.id, title, due_date, description, files });
     renderTable();
     form.reset();
   }
@@ -80,22 +69,16 @@ async function handleAddAssignment(event) {
 async function handleUpdateAssignment(id, fields) {
   const response = await fetch("./api/index.php", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id, ...fields })
   });
 
   const result = await response.json();
 
   if (result.success) {
-    assignments = assignments.map(a =>
-      a.id === id ? { ...a, ...fields } : a
-    );
-
+    assignments = assignments.map(a => a.id === id ? { ...a, ...fields } : a);
     renderTable();
     form.reset();
-
     submitBtn.textContent = "Add Assignment";
     delete submitBtn.dataset.editId;
   }
@@ -106,11 +89,7 @@ async function handleTableClick(event) {
 
   if (target.classList.contains("delete-btn")) {
     const id = parseInt(target.dataset.id);
-
-    const response = await fetch(`./api/index.php?id=${id}`, {
-      method: "DELETE"
-    });
-
+    const response = await fetch(`./api/index.php?id=${id}`, { method: "DELETE" });
     const result = await response.json();
 
     if (result.success) {
@@ -128,7 +107,6 @@ async function handleTableClick(event) {
       document.getElementById("assignment-due-date").value = assignment.due_date;
       document.getElementById("assignment-description").value = assignment.description;
       document.getElementById("assignment-files").value = (assignment.files || []).join("\n");
-
       submitBtn.textContent = "Update Assignment";
       submitBtn.dataset.editId = id;
     }
@@ -141,10 +119,7 @@ async function loadAndInitialize() {
     const result = await response.json();
 
     if (result.success) {
-      assignments = result.data.map(a => ({
-        ...a,
-        files: a.files || []
-      }));
+      assignments = result.data.map(a => ({ ...a, files: a.files || [] }));
       renderTable();
     }
   } catch (error) {
