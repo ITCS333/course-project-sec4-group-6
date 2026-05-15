@@ -61,38 +61,40 @@
 // ============================================================================
 
 // TODO: Set headers for JSON response and CORS.
-// Set Content-Type to application/json.
-// Allow cross-origin requests (CORS) if needed.
-// Allow HTTP methods: GET, POST, PUT, DELETE, OPTIONS.
-// Allow headers: Content-Type, Authorization.
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 
 // TODO: Handle preflight OPTIONS request.
-// If the request method is OPTIONS, return HTTP 200 and exit.
-
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 // TODO: Include the shared database connection file.
-// require_once __DIR__ . '/../../common/db.php';
+require_once __DIR__ . '/../../common/db.php';
 
 
 // TODO: Get the PDO database connection.
-// $db = getDBConnection();
-
+$db = getDBConnection();
 
 // TODO: Read the HTTP request method.
-// $method = $_SERVER['REQUEST_METHOD'];
+$method = $_SERVER['REQUEST_METHOD'];
 
 
 // TODO: Read and decode the request body for POST and PUT requests.
-// $rawData = file_get_contents('php://input');
-// $data    = json_decode($rawData, true) ?? [];
+$rawData = file_get_contents('php://input');
+$data    = json_decode($rawData, true) ?? [];
+
 
 
 // TODO: Read query parameters.
-// $action    = $_GET['action']     ?? null;  // 'comments', 'comment', 'delete_comment'
-// $id        = $_GET['id']         ?? null;  // integer week id
-// $weekId    = $_GET['week_id']    ?? null;  // integer week id for comments queries
-// $commentId = $_GET['comment_id'] ?? null;  // integer comment id
+$action    = $_GET['action']     ?? null;
+$id        = $_GET['id']         ?? null;
+$weekId    = $_GET['week_id']    ?? null;
+$commentId = $_GET['comment_id'] ?? null;
 
 
 // ============================================================================
@@ -113,29 +115,48 @@
  */
 function getAllWeeks(PDO $db): void
 {
-    // TODO: Build the base SELECT query.
-    // SELECT id, title, start_date, description, links, created_at FROM weeks
+$query = "SELECT id, title, start_date, description, links, created_at FROM weeks";
 
-    // TODO: If $_GET['search'] is provided and non-empty, append:
-    // WHERE title LIKE :search OR description LIKE :search
-    // Bind '%' . $search . '%' to :search.
+    $search = $_GET['search'] ?? '';
 
-    // TODO: Validate $_GET['sort'] against the whitelist [title, start_date].
-    // Default to 'start_date' if missing or invalid.
+    if (!empty($search)) {
+        $query .= " WHERE title LIKE :search OR description LIKE :search";
+    }
 
-    // TODO: Validate $_GET['order'] against [asc, desc].
-    // Default to 'asc' if missing or invalid.
+    $allowedSort = ['title', 'start_date'];
+    $sort = $_GET['sort'] ?? 'start_date';
 
-    // TODO: Append ORDER BY {sort} {order} to the query.
+    if (!in_array($sort, $allowedSort)) {
+        $sort = 'start_date';
+    }
 
-    // TODO: Prepare, bind (if searching), and execute the statement.
+    $allowedOrder = ['asc', 'desc'];
+    $order = strtolower($_GET['order'] ?? 'asc');
 
-    // TODO: Fetch all rows as an associative array.
+    if (!in_array($order, $allowedOrder)) {
+        $order = 'asc';
+    }
 
-    // TODO: For each row, decode the links column:
-    // $row['links'] = json_decode($row['links'], true) ?? [];
+    $query .= " ORDER BY $sort $order";
 
-    // TODO: Call sendResponse(['success' => true, 'data' => $weeks]);
+    $stmt = $db->prepare($query);
+
+    if (!empty($search)) {
+        $stmt->bindValue(':search', '%' . $search . '%');
+    }
+
+    $stmt->execute();
+
+    $weeks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($weeks as &$row) {
+        $row['links'] = json_decode($row['links'], true) ?? [];
+    }
+
+    sendResponse([
+        'success' => true,
+        'data' => $weeks
+    ]);
 }
 
 
@@ -150,17 +171,42 @@ function getAllWeeks(PDO $db): void
  */
 function getWeekById(PDO $db, $id): void
 {
-    // TODO: Validate that $id is provided and numeric.
-    // If not, call sendResponse with HTTP 400.
+// Validate id.
+    if (!$id || !is_numeric($id)) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid week id'
+        ], 400);
+    }
 
-    // TODO: SELECT id, title, start_date, description, links, created_at
-    //       FROM weeks WHERE id = ?
+    // Select week by id.
+    $query = "SELECT id, title, start_date, description, links, created_at
+              FROM weeks
+              WHERE id = ?";
 
-    // TODO: Fetch one row. Decode the links JSON:
-    // $week['links'] = json_decode($week['links'], true) ?? [];
+    $stmt = $db->prepare($query);
+    $stmt->execute([$id]);
 
-    // TODO: If found, sendResponse success with the week.
-    // If not found, sendResponse error with HTTP 404.
+    // Fetch one row.
+    $week = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if found.
+    if ($week) {
+
+        $week['links'] = json_decode($week['links'], true) ?? [];
+
+        sendResponse([
+            'success' => true,
+            'data' => $week
+        ]);
+
+    } else {
+
+        sendResponse([
+            'success' => false,
+            'message' => 'Week not found'
+        ], 404);
+    }
 }
 
 
@@ -179,25 +225,68 @@ function getWeekById(PDO $db, $id): void
  */
 function createWeek(PDO $db, array $data): void
 {
-    // TODO: Validate that title and start_date are present and non-empty.
-    // If missing, sendResponse HTTP 400.
+ // Validate required fields.
+    if (
+        empty($data['title']) ||
+        empty($data['start_date'])
+    ) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Title and start_date are required'
+        ], 400);
+    }
 
-    // TODO: Trim title, start_date, and description.
+    // Trim values.
+    $title = trim($data['title']);
+    $start_date = trim($data['start_date']);
+    $description = trim($data['description'] ?? '');
 
-    // TODO: Validate start_date format using DateTime::createFromFormat('Y-m-d', $start_date).
-    // If invalid, sendResponse HTTP 400.
+    // Validate date format.
+    $date = DateTime::createFromFormat('Y-m-d', $start_date);
 
-    // TODO: Default description to "" if not provided.
+    if (!$date || $date->format('Y-m-d') !== $start_date) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid start_date format'
+        ], 400);
+    }
 
-    // TODO: Handle links: if provided and is an array, json_encode it.
-    // Otherwise use json_encode([]).
+    // Handle links.
+    if (isset($data['links']) && is_array($data['links'])) {
+        $links = json_encode($data['links']);
+    } else {
+        $links = json_encode([]);
+    }
 
-    // TODO: INSERT INTO weeks (title, start_date, description, links)
-    //       VALUES (?, ?, ?, ?)
-    // Note: id, created_at, and updated_at are handled by MySQL automatically.
+    // Insert week.
+    $query = "INSERT INTO weeks (title, start_date, description, links)
+              VALUES (?, ?, ?, ?)";
 
-    // TODO: If rowCount() > 0, sendResponse HTTP 201 with the new id.
-    // Otherwise sendResponse HTTP 500.
+    $stmt = $db->prepare($query);
+
+    $stmt->execute([
+        $title,
+        $start_date,
+        $description,
+        $links
+    ]);
+
+    // Check insertion result.
+    if ($stmt->rowCount() > 0) {
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Week created successfully',
+            'id' => (int)$db->lastInsertId()
+        ], 201);
+
+    } else {
+
+        sendResponse([
+            'success' => false,
+            'message' => 'Failed to create week'
+        ], 500);
+    }
 }
 
 
@@ -216,26 +305,94 @@ function createWeek(PDO $db, array $data): void
  */
 function updateWeek(PDO $db, array $data): void
 {
-    // TODO: Validate that $data['id'] is present.
-    // If not, sendResponse HTTP 400.
+  // Validate id.
+    if (empty($data['id'])) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Week id is required'
+        ], 400);
+    }
 
-    // TODO: Check that a week with this id exists.
-    // If not, sendResponse HTTP 404.
+    $id = $data['id'];
 
-    // TODO: Dynamically build the SET clause for whichever of
-    // title, start_date, description, links are present in $data.
-    // - If start_date is included, validate its format.
-    // - If links is included, json_encode it.
+    // Check if week exists.
+    $checkQuery = "SELECT id FROM weeks WHERE id = ?";
+    $checkStmt = $db->prepare($checkQuery);
+    $checkStmt->execute([$id]);
 
-    // TODO: If no updatable fields are present, sendResponse HTTP 400.
+    if (!$checkStmt->fetch()) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Week not found'
+        ], 404);
+    }
 
-    // TODO: updated_at is updated automatically by MySQL
-    //       (ON UPDATE CURRENT_TIMESTAMP), so no need to set it manually.
+    // Build dynamic SET clause.
+    $fields = [];
+    $values = [];
 
-    // TODO: Build: UPDATE weeks SET {clauses} WHERE id = ?
-    // Prepare, bind all SET values, then bind id, and execute.
+    if (isset($data['title'])) {
+        $fields[] = "title = ?";
+        $values[] = trim($data['title']);
+    }
 
-    // TODO: sendResponse HTTP 200 on success, HTTP 500 on failure.
+    if (isset($data['start_date'])) {
+        $start_date = trim($data['start_date']);
+
+        $date = DateTime::createFromFormat('Y-m-d', $start_date);
+
+        if (!$date || $date->format('Y-m-d') !== $start_date) {
+            sendResponse([
+                'success' => false,
+                'message' => 'Invalid start_date format'
+            ], 400);
+        }
+
+        $fields[] = "start_date = ?";
+        $values[] = $start_date;
+    }
+
+    if (isset($data['description'])) {
+        $fields[] = "description = ?";
+        $values[] = trim($data['description']);
+    }
+
+    if (isset($data['links'])) {
+        $fields[] = "links = ?";
+
+        if (is_array($data['links'])) {
+            $values[] = json_encode($data['links']);
+        } else {
+            $values[] = json_encode([]);
+        }
+    }
+
+    // Check if there are fields to update.
+    if (empty($fields)) {
+        sendResponse([
+            'success' => false,
+            'message' => 'No fields provided for update'
+        ], 400);
+    }
+
+    // Build update query.
+    $query = "UPDATE weeks SET " . implode(', ', $fields) . " WHERE id = ?";
+
+    $values[] = $id;
+
+    $stmt = $db->prepare($query);
+
+    if ($stmt->execute($values)) {
+        sendResponse([
+            'success' => true,
+            'message' => 'Week updated successfully'
+        ], 200);
+    } else {
+        sendResponse([
+            'success' => false,
+            'message' => 'Failed to update week'
+        ], 500);
+    }
 }
 
 
@@ -252,17 +409,46 @@ function updateWeek(PDO $db, array $data): void
  */
 function deleteWeek(PDO $db, $id): void
 {
-    // TODO: Validate that $id is provided and numeric.
-    // If not, sendResponse HTTP 400.
+// Validate id.
+    if (!$id || !is_numeric($id)) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid week id'
+        ], 400);
+    }
 
-    // TODO: Check that a week with this id exists.
-    // If not, sendResponse HTTP 404.
+    // Check if week exists.
+    $checkQuery = "SELECT id FROM weeks WHERE id = ?";
+    $checkStmt = $db->prepare($checkQuery);
+    $checkStmt->execute([$id]);
 
-    // TODO: DELETE FROM weeks WHERE id = ?
-    // (comments_week rows are removed automatically by ON DELETE CASCADE.)
+    if (!$checkStmt->fetch()) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Week not found'
+        ], 404);
+    }
 
-    // TODO: If rowCount() > 0, sendResponse HTTP 200.
-    // Otherwise sendResponse HTTP 500.
+    // Delete week.
+    $query = "DELETE FROM weeks WHERE id = ?";
+    $stmt = $db->prepare($query);
+    $stmt->execute([$id]);
+
+    // Check deletion result.
+    if ($stmt->rowCount() > 0) {
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Week deleted successfully'
+        ], 200);
+
+    } else {
+
+        sendResponse([
+            'success' => false,
+            'message' => 'Failed to delete week'
+        ], 500);
+    }
 }
 
 
@@ -281,16 +467,31 @@ function deleteWeek(PDO $db, $id): void
  */
 function getCommentsByWeek(PDO $db, $weekId): void
 {
-    // TODO: Validate that $weekId is provided and numeric.
-    // If not, sendResponse HTTP 400.
+ // Validate week id.
+    if (!$weekId || !is_numeric($weekId)) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid week id'
+        ], 400);
+    }
 
-    // TODO: SELECT id, week_id, author, text, created_at
-    //       FROM comments_week
-    //       WHERE week_id = ?
-    //       ORDER BY created_at ASC
+    // Select comments.
+    $query = "SELECT id, week_id, author, text, created_at
+              FROM comments_week
+              WHERE week_id = ?
+              ORDER BY created_at ASC";
 
-    // TODO: Fetch all rows. Return sendResponse with the array
-    //       (empty array is valid).
+    $stmt = $db->prepare($query);
+    $stmt->execute([$weekId]);
+
+    // Fetch all comments.
+    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Return response.
+    sendResponse([
+        'success' => true,
+        'data' => $comments
+    ]);
 }
 
 
@@ -309,20 +510,75 @@ function getCommentsByWeek(PDO $db, $weekId): void
  */
 function createComment(PDO $db, array $data): void
 {
-    // TODO: Validate that week_id, author, and text are all present and
-    // non-empty after trimming. If any are missing, sendResponse HTTP 400.
+// Validate required fields.
+    if (
+        empty($data['week_id']) ||
+        empty(trim($data['author'] ?? '')) ||
+        empty(trim($data['text'] ?? ''))
+    ) {
+        sendResponse([
+            'success' => false,
+            'message' => 'week_id, author, and text are required'
+        ], 400);
+    }
 
-    // TODO: Validate that week_id is numeric.
+    // Validate week_id.
+    if (!is_numeric($data['week_id'])) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid week id'
+        ], 400);
+    }
 
-    // TODO: Check that a week with this id exists in the weeks table.
-    // If not, sendResponse HTTP 404.
+    $weekId = $data['week_id'];
+    $author = trim($data['author']);
+    $text = trim($data['text']);
 
-    // TODO: INSERT INTO comments_week (week_id, author, text)
-    //       VALUES (?, ?, ?)
+    // Check if week exists.
+    $checkQuery = "SELECT id FROM weeks WHERE id = ?";
+    $checkStmt = $db->prepare($checkQuery);
+    $checkStmt->execute([$weekId]);
 
-    // TODO: If rowCount() > 0, sendResponse HTTP 201 with the new id
-    //       and the full new comment object.
-    // Otherwise sendResponse HTTP 500.
+    if (!$checkStmt->fetch()) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Week not found'
+        ], 404);
+    }
+
+    // Insert comment.
+    $query = "INSERT INTO comments_week (week_id, author, text)
+              VALUES (?, ?, ?)";
+
+    $stmt = $db->prepare($query);
+    $stmt->execute([$weekId, $author, $text]);
+
+    // Check insertion result.
+    if ($stmt->rowCount() > 0) {
+
+        $newId = (int)$db->lastInsertId();
+
+        $comment = [
+            'id' => $newId,
+            'week_id' => (int)$weekId,
+            'author' => $author,
+            'text' => $text
+        ];
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Comment created successfully',
+            'id' => $newId,
+            'data' => $comment
+        ], 201);
+
+    } else {
+
+        sendResponse([
+            'success' => false,
+            'message' => 'Failed to create comment'
+        ], 500);
+    }
 }
 
 
@@ -335,16 +591,46 @@ function createComment(PDO $db, array $data): void
  */
 function deleteComment(PDO $db, $commentId): void
 {
-    // TODO: Validate that $commentId is provided and numeric.
-    // If not, sendResponse HTTP 400.
+// Validate comment id.
+    if (!$commentId || !is_numeric($commentId)) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Invalid comment id'
+        ], 400);
+    }
 
-    // TODO: Check that the comment exists in comments_week.
-    // If not, sendResponse HTTP 404.
+    // Check if comment exists.
+    $checkQuery = "SELECT id FROM comments_week WHERE id = ?";
+    $checkStmt = $db->prepare($checkQuery);
+    $checkStmt->execute([$commentId]);
 
-    // TODO: DELETE FROM comments_week WHERE id = ?
+    if (!$checkStmt->fetch()) {
+        sendResponse([
+            'success' => false,
+            'message' => 'Comment not found'
+        ], 404);
+    }
 
-    // TODO: If rowCount() > 0, sendResponse HTTP 200.
-    // Otherwise sendResponse HTTP 500.
+    // Delete comment.
+    $query = "DELETE FROM comments_week WHERE id = ?";
+    $stmt = $db->prepare($query);
+    $stmt->execute([$commentId]);
+
+    // Check deletion result.
+    if ($stmt->rowCount() > 0) {
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Comment deleted successfully'
+        ], 200);
+
+    } else {
+
+        sendResponse([
+            'success' => false,
+            'message' => 'Failed to delete comment'
+        ], 500);
+    }
 }
 
 
@@ -354,49 +640,64 @@ function deleteComment(PDO $db, $commentId): void
 
 try {
 
+try {
+
     if ($method === 'GET') {
 
-        // ?action=comments&week_id={id} → list comments for a week
-        // TODO: if $action === 'comments', call getCommentsByWeek($db, $weekId)
+        if ($action === 'comments') {
+            getCommentsByWeek($db, $weekId);
 
-        // ?id={id} → single week
-        // TODO: elseif $id is set, call getWeekById($db, $id)
+        } elseif ($id !== null) {
+            getWeekById($db, $id);
 
-        // no parameters → all weeks (supports ?search, ?sort, ?order)
-        // TODO: else call getAllWeeks($db)
+        } else {
+            getAllWeeks($db);
+        }
 
     } elseif ($method === 'POST') {
 
-        // ?action=comment → create a comment in comments_week
-        // TODO: if $action === 'comment', call createComment($db, $data)
+        if ($action === 'comment') {
+            createComment($db, $data);
 
-        // no action → create a new week
-        // TODO: else call createWeek($db, $data)
+        } else {
+            createWeek($db, $data);
+        }
 
     } elseif ($method === 'PUT') {
 
-        // Update a week; id comes from the JSON body
-        // TODO: call updateWeek($db, $data)
+        updateWeek($db, $data);
 
     } elseif ($method === 'DELETE') {
 
-        // ?action=delete_comment&comment_id={id} → delete one comment
-        // TODO: if $action === 'delete_comment', call deleteComment($db, $commentId)
+        if ($action === 'delete_comment') {
+            deleteComment($db, $commentId);
 
-        // ?id={id} → delete a week (and its comments via CASCADE)
-        // TODO: else call deleteWeek($db, $id)
+        } else {
+            deleteWeek($db, $id);
+        }
 
     } else {
-        // TODO: sendResponse HTTP 405 Method Not Allowed.
+        sendResponse([
+            'success' => false,
+            'message' => 'Method not allowed'
+        ], 405);
     }
 
 } catch (PDOException $e) {
-    // TODO: Log the error with error_log().
-    // Return a generic HTTP 500 — do NOT expose $e->getMessage() to clients.
+    error_log($e->getMessage());
+
+    sendResponse([
+        'success' => false,
+        'message' => 'Database error occurred'
+    ], 500);
 
 } catch (Exception $e) {
-    // TODO: Log the error with error_log().
-    // Return HTTP 500 using sendResponse().
+    error_log($e->getMessage());
+
+    sendResponse([
+        'success' => false,
+        'message' => 'Server error occurred'
+    ], 500);
 }
 
 
@@ -412,9 +713,11 @@ try {
  */
 function sendResponse(array $data, int $statusCode = 200): void
 {
-    // TODO: http_response_code($statusCode);
-    // TODO: echo json_encode($data, JSON_PRETTY_PRINT);
-    // TODO: exit;
+http_response_code($statusCode);
+
+    echo json_encode($data, JSON_PRETTY_PRINT);
+
+    exit;
 }
 
 
@@ -426,8 +729,9 @@ function sendResponse(array $data, int $statusCode = 200): void
  */
 function validateDate(string $date): bool
 {
-    // TODO: $d = DateTime::createFromFormat('Y-m-d', $date);
-    // TODO: return $d && $d->format('Y-m-d') === $date;
+ $d = DateTime::createFromFormat('Y-m-d', $date);
+
+    return $d && $d->format('Y-m-d') === $date;
 }
 
 
@@ -439,5 +743,9 @@ function validateDate(string $date): bool
  */
 function sanitizeInput(string $data): string
 {
-    // TODO: return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
-}
+  return htmlspecialchars(
+        strip_tags(trim($data)),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+    }
