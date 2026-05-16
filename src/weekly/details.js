@@ -63,11 +63,9 @@ const newCommentInput = document.getElementById('new-comment');
  *    the integer primary key of the week).
  */
 function getWeekIdFromURL() {
-const queryString = window.location.search;
-
-  const params = new URLSearchParams(queryString);
-
-  return params.get('id');}
+const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
 
 /**
  * TODO: Implement renderWeekDetails.
@@ -88,25 +86,22 @@ const queryString = window.location.search;
 function renderWeekDetails(week) {
   weekTitle.textContent = week.title;
 
-  weekStartDate.textContent = 'Starts on: ' + week.start_date;
+  weekStartDate.textContent = "Starts on: " + week.start_date;
 
   weekDescription.textContent = week.description;
 
-  weekLinksList.innerHTML = '';
+  weekLinksList.innerHTML = "";
 
-  week.links.forEach((url) => {
+  week.links.forEach(url => {
+    const li = document.createElement("li");
 
-    const li = document.createElement('li');
-
-    const a = document.createElement('a');
-
+    const a = document.createElement("a");
     a.href = url;
     a.textContent = url;
 
     li.appendChild(a);
 
     weekLinksList.appendChild(li);
-
   });}
 
 /**
@@ -123,28 +118,18 @@ function renderWeekDetails(week) {
  *   </article>
  */
 function createCommentArticle(comment) {
-weekTitle.textContent = week.title;
+ const article = document.createElement("article");
 
-  weekStartDate.textContent = "Starts on: " + week.start_date;
+  const p = document.createElement("p");
+  p.textContent = comment.text;
 
-  weekDescription.textContent = week.description;
+  const footer = document.createElement("footer");
+  footer.textContent = "Posted by: " + comment.author;
 
-  weekLinksList.innerHTML = '';
+  article.appendChild(p);
+  article.appendChild(footer);
 
-  week.links.forEach((url) => {
-
-    const li = document.createElement('li');
-
-    const a = document.createElement('a');
-
-    a.href = url;
-    a.textContent = url;
-
-    li.appendChild(a);
-
-    weekLinksList.appendChild(li);
-
-  });}
+  return article;}
 
 /**
  * TODO: Implement renderComments.
@@ -156,14 +141,12 @@ weekTitle.textContent = week.title;
  *    append the result to commentList.
  */
 function renderComments() {
-commentList.innerHTML = '';
+  commentList.innerHTML = "";
 
-  currentComments.forEach((comment) => {
-
+  currentComments.forEach(comment => {
     const article = createCommentArticle(comment);
 
     commentList.appendChild(article);
-
   });}
 
 /**
@@ -188,22 +171,22 @@ commentList.innerHTML = '';
  *    - Clear newCommentInput.
  */
 async function handleAddComment(event) {
- event.preventDefault();
+  event.preventDefault();
 
   const commentText = newCommentInput.value.trim();
 
-  if (commentText === '') {
+  if (commentText === "") {
     return;
   }
 
-  const response = await fetch('./api/index.php?action=comment', {
-    method: 'POST',
+  const response = await fetch("./api/index.php?action=comment", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       week_id: currentWeekId,
-      author: 'Student',
+      author: "Student",
       text: commentText
     })
   });
@@ -212,10 +195,8 @@ async function handleAddComment(event) {
 
   if (result.success === true) {
     currentComments.push(result.data);
-
     renderComments();
-
-    newCommentInput.value = '';
+    newCommentInput.value = "";
   }
 }
 
@@ -244,17 +225,16 @@ async function handleAddComment(event) {
  *    - Set weekTitle.textContent = "Week not found."
  */
 async function initializePage() {
+ currentWeekId = getWeekIdFromURL();
 
-  currentWeekId = getWeekIdFromURL();
-
-  if (currentWeekId === null || currentWeekId === '') {
-    weekTitle.textContent = 'Week not found.';
+  if (currentWeekId === null || currentWeekId === "") {
+    weekTitle.textContent = "Week not found.";
     return;
   }
 
   const [weekResponse, commentsResponse] = await Promise.all([
-    fetch('./api/index.php?id=' + currentWeekId),
-    fetch('./api/index.php?action=comments&week_id=' + currentWeekId)
+    fetch("./api/index.php?id=" + currentWeekId),
+    fetch("./api/index.php?action=comments&week_id=" + currentWeekId)
   ]);
 
   const weekResult = await weekResponse.json();
@@ -263,13 +243,14 @@ async function initializePage() {
   currentComments = commentsResult.data || [];
 
   if (weekResult.success === true && weekResult.data) {
-    renderWeekDetails(weekResult.data);
+    const week = weekResult.data;
 
+    renderWeekDetails(week);
     renderComments();
 
-    commentForm.addEventListener('submit', handleAddComment);
+    commentForm.addEventListener("submit", handleAddComment);
   } else {
-    weekTitle.textContent = 'Week not found.';
+    weekTitle.textContent = "Week not found.";
   }}
 
 // --- Initial Page Load ---
