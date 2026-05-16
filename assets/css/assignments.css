@@ -1,14 +1,16 @@
 /* ============================================================
-   Shared Stylesheet — Course Assignment Pages
+   style.css — Shared Stylesheet for all Assignment Pages
+   (admin.html, details.html, index.html)
    ============================================================ */
 
+/* ── Reset ── */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body */
+/* ── Body ── */
 body {
   font-family: Arial, sans-serif;
   background-color: #f5efe6;
@@ -17,7 +19,7 @@ body {
   padding: 20px;
 }
 
-/* Header */
+/* ── Header ── */
 header {
   background-color: #6b4f3b;
   color: #fff8f0;
@@ -30,14 +32,22 @@ header h1 {
   font-size: 2rem;
 }
 
-/* Main */
+/* ── Main ── */
 main {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Sections & Articles */
+/* ── admin.html: two-column grid ── */
+main.admin-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Sections & Articles (cards) ── */
 section,
 article {
   background-color: #fffaf3;
@@ -46,32 +56,37 @@ article {
   box-shadow: 0 4px 10px rgba(107, 79, 59, 0.15);
 }
 
+/* ── Headings ── */
 h2,
 h3 {
   margin-bottom: 15px;
   color: #6b4f3b;
 }
 
-/* Forms */
+/* ── Forms ── */
 form {
   margin-top: 15px;
 }
+
 fieldset {
   border: 1px solid #d6c2b0;
   border-radius: 10px;
   padding: 15px;
 }
+
 legend {
   font-weight: bold;
   color: #6b4f3b;
   padding: 0 8px;
 }
+
 label {
   display: block;
   margin-top: 12px;
   margin-bottom: 6px;
   font-weight: 600;
 }
+
 input,
 select,
 textarea {
@@ -84,6 +99,7 @@ textarea {
   font-family: Arial, sans-serif;
   resize: vertical;
 }
+
 input:focus,
 select:focus,
 textarea:focus {
@@ -92,7 +108,7 @@ textarea:focus {
   box-shadow: 0 0 4px rgba(166, 124, 82, 0.4);
 }
 
-/* Buttons */
+/* ── Buttons (default: full-width) ── */
 button {
   width: 100%;
   padding: 10px;
@@ -110,10 +126,11 @@ button:hover {
   background-color: #6b4f3b;
 }
 
-/* Table */
+/* ── Table (admin.html) ── */
 .table-wrap {
   overflow-x: auto;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -121,24 +138,28 @@ table {
   overflow: hidden;
   border-radius: 10px;
 }
+
 thead {
   background-color: #6b4f3b;
   color: #fffaf3;
 }
+
 th,
 td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #e0d3c2;
 }
+
 th {
   cursor: pointer;
 }
+
 tbody tr:hover {
   background-color: #f2e6d9;
 }
 
-/* ── admin.html: inline action buttons ── */
+/* ── Edit / Delete action buttons (admin.html) ── */
 .edit-btn,
 .delete-btn {
   width: auto;
@@ -147,6 +168,7 @@ tbody tr:hover {
   margin-right: 6px;
   font-size: 0.85rem;
 }
+
 .delete-btn {
   background-color: #a83a10;
 }
@@ -154,7 +176,7 @@ tbody tr:hover {
   background-color: #7a2a0c;
 }
 
-/* ── admin.html: empty table state ── */
+/* ── Empty table state (admin.html) ── */
 #assignments-tbody:empty::after {
   content: "No assignments yet — add one using the form.";
   display: block;
@@ -164,22 +186,19 @@ tbody tr:hover {
   font-style: italic;
 }
 
-/* ── admin.html: two-column layout ── */
-.admin-grid {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-/* ── details.html: due date ── */
+/* ── Assignment due date (details.html) ── */
 #assignment-due-date {
   font-weight: bold;
   color: #8b5e3c;
   margin-bottom: 12px;
 }
 
-/* ── details.html: files list ── */
+/* ── Assignment description spacing (details.html) ── */
+#assignment-description {
+  margin-bottom: 12px;
+}
+
+/* ── Attached files list (details.html) ── */
 #assignment-files-list {
   list-style: disc;
   padding-left: 20px;
@@ -195,51 +214,62 @@ tbody tr:hover {
   color: #6b4f3b;
 }
 
-/* ── details.html: comment cards ── */
+/* ── Comment list (details.html) ── */
 #comment-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 20px;
 }
+
 #comment-list article {
   padding: 14px 16px;
   border-left: 4px solid #8b5e3c;
   box-shadow: 0 2px 6px rgba(107, 79, 59, 0.1);
 }
+
 #comment-list article p {
   margin-bottom: 6px;
 }
+
 #comment-list article footer {
   font-size: 0.85rem;
   color: #8b6f5e;
   font-style: italic;
 }
 
-/* ── index.html: assignment cards ── */
+/* ── Assignment cards list (index.html) ── */
 #assignment-list-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
+
 #assignment-list-section article {
   border-left: 5px solid #8b5e3c;
   transition: box-shadow 0.2s ease;
 }
+
 #assignment-list-section article:hover {
   box-shadow: 0 6px 16px rgba(107, 79, 59, 0.25);
 }
+
 #assignment-list-section h2 {
   font-size: 1.2rem;
   margin-bottom: 6px;
 }
+
+/* Due date line inside each card */
 #assignment-list-section p:first-of-type {
   font-weight: bold;
   color: #8b5e3c;
+  margin-bottom: 4px;
 }
+
+/* "View Details & Discussion" link styled as a button */
 #assignment-list-section a {
   display: inline-block;
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 8px 18px;
   background-color: #8b5e3c;
   color: #fffaf3;
@@ -253,6 +283,8 @@ tbody tr:hover {
 #assignment-list-section a:hover {
   background-color: #6b4f3b;
 }
+
+/* Empty state when no assignments exist */
 #assignment-list-section:empty::after {
   content: "No assignments have been posted yet.";
   display: block;
@@ -265,13 +297,16 @@ tbody tr:hover {
   box-shadow: 0 4px 10px rgba(107, 79, 59, 0.15);
 }
 
-/* Responsive */
+/* ── Responsive ── */
 @media (max-width: 768px) {
   body {
     padding: 10px;
   }
   header h1 {
     font-size: 1.5rem;
+  }
+  main.admin-grid {
+    grid-template-columns: 1fr;
   }
   section,
   article {
@@ -281,8 +316,5 @@ tbody tr:hover {
   td {
     font-size: 0.9rem;
     padding: 10px;
-  }
-  .admin-grid {
-    grid-template-columns: 1fr;
   }
 }
