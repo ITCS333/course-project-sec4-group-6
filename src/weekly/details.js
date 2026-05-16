@@ -86,8 +86,28 @@ const queryString = window.location.search;
  *    (week.links is already a decoded string array from the API.)
  */
 function renderWeekDetails(week) {
-  // ... your implementation here ...
-}
+  weekTitle.textContent = week.title;
+
+  weekStartDate.textContent = 'Starts on: ' + week.start_date;
+
+  weekDescription.textContent = week.description;
+
+  weekLinksList.innerHTML = '';
+
+  week.links.forEach((url) => {
+
+    const li = document.createElement('li');
+
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.textContent = url;
+
+    li.appendChild(a);
+
+    weekLinksList.appendChild(li);
+
+  });}
 
 /**
  * TODO: Implement createCommentArticle.
