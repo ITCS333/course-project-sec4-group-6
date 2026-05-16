@@ -1,61 +1,53 @@
-<!--
-  Requirement: Create the Dedicated Page for a Single Assignment
-
-  Instructions:
-  This page displays the full details for one assignment and allows
-  students to read and post discussion comments.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assignment Details</title>
-
-    <link rel="stylesheet" href="../../assets/css/Assignment.css">
     <script src="details.js" defer></script>
 </head>
 <body>
 
-<header>
-    <h1 id="assignment-title"></h1>
-</header>
+    <header>
+        <h1 id="assignment-title"></h1>
+    </header>
 
-<main>
+    <main>
 
-    <!-- Assignment Info -->
-    <article>
-        <p id="assignment-due-date"></p>
+        <!-- ============================================================
+             Section 1: Assignment Information
+             ============================================================ -->
+        <article>
+            <p id="assignment-due-date"></p>
+            <h2>Description</h2>
+            <p id="assignment-description"></p>
+            <h2>Attached Files &amp; Links</h2>
+            <ul id="assignment-files-list"></ul>
+        </article>
 
-        <h2>Description</h2>
-        <p id="assignment-description"></p>
+        <!-- ============================================================
+             Section 2: Discussion Forum
+             ============================================================ -->
+        <section id="discussion-forum">
+            <h2>Questions &amp; Discussion</h2>
 
-        <h2>Attached Files & Links</h2>
-        <ul id="assignment-files-list"></ul>
-    </article>
+            <!-- Subsection 2.1: Existing Comments -->
+            <div id="comment-list"></div>
 
-    <!-- Discussion Forum -->
-    <section id="discussion-forum">
-        <h2>Questions & Discussion</h2>
+            <!-- Subsection 2.2: Add a Comment Form -->
+            <form id="comment-form" action="#">
+                <fieldset>
+                    <legend>Ask a Question</legend>
 
-        <!-- Comments -->
-        <div id="comment-list"></div>
+                    <label for="new-comment">Comment</label>
+                    <textarea id="new-comment" required></textarea>
 
-        <!-- Add Comment -->
-        <form id="comment-form" action="#">
-            <fieldset>
-                <legend>Ask a Question</legend>
+                    <button type="submit">Post Comment</button>
+                </fieldset>
+            </form>
+        </section>
 
-                <label for="new-comment">Your Comment</label>
-                <textarea id="new-comment" required></textarea>
-
-                <button type="submit">Post Comment</button>
-            </fieldset>
-        </form>
-
-    </section>
-
-</main>
+    </main>
 
 </body>
 </html>
