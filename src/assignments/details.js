@@ -37,7 +37,7 @@ function renderAssignmentDetails(assignment) {
 
   // Rebuild the files list
   assignmentFilesList.innerHTML = '';
-  assignment.files.forEach(url => {
+  (assignment.files ?? []).forEach(url => {
     const li = document.createElement('li');
     const a  = document.createElement('a');
     a.href        = url;
