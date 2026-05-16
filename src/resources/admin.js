@@ -8,14 +8,14 @@ let editId = null;
 
 function createResourceRow(resource) {
 
- const tr = document.createElement("tr");
+  const tr = document.createElement("tr");
 
   tr.innerHTML = `
     <td>${resource.title}</td>
     <td>${resource.description}</td>
     <td>
       <a href="${resource.link}" target="_blank">
-        ${resource.link}
+        Open Link
       </a>
     </td>
     <td>
