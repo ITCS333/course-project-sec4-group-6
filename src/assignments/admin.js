@@ -198,7 +198,7 @@ async function handleTableClick(event) {
     submitBtn.dataset.editId = assignment.id;
 
     // Scroll form into view on mobile
-    assignmentForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    assignmentForm.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }
 }
 
