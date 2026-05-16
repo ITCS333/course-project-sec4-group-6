@@ -92,7 +92,7 @@ function renderWeekDetails(week) {
 
   weekLinksList.innerHTML = "";
 
-  week.links.forEach(url => {
+  (week.links || []).forEach(url => {
     const li = document.createElement("li");
 
     const a = document.createElement("a");
