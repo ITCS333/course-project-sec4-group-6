@@ -28,6 +28,7 @@
     }
 
   Comment object shape returned by the API
+
   (from the comments_week table):
     {
       id:          number,
@@ -255,3 +256,4 @@ async function initializePage() {
 
 // --- Initial Page Load ---
 initializePage();
+
