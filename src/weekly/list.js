@@ -95,3 +95,4 @@ const response = await fetch('./api/index.php');
 
 // --- Initial Page Load ---
 loadWeeks();
+
