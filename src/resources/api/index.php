@@ -78,11 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // TODO: Include the database connection file
-require_once __DIR__ . '/config/Database.php';
+require_once __DIR__ . '/../../common/db.php';
 
 // TODO: Get the PDO database connection
-$database = new Database();
-$db = $database->getConnection();
+$db = getDBConnection();
 
 
 // TODO: Get the HTTP request method
