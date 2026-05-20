@@ -27,11 +27,15 @@ function createResourceRow(resource) {
 }
 
 function renderTable() {
-  resourcesTbody.innerHTML = "";
+ const tbody = document.querySelector("#resources-tbody");
+
+  tbody.innerHTML = "";
 
   resources.forEach(resource => {
+
     const row = createResourceRow(resource);
-    resourcesTbody.appendChild(row);
+
+    tbody.appendChild(row);
   });
 }
 
