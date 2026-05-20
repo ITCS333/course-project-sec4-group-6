@@ -1,11 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login</title>
 
 
 <link
@@ -15,45 +17,36 @@
      <link rel="stylesheet" href="../../assets/css/auth.css">
 
 </head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <main>
+<body class="d-flex justify-content-center align-items-center vh-100">
+<main class="w-100" style="max-width: 400px;">
+<section class="card p-4 shadow">
+<h2 class="text-center mb-3">Welcome Back!</h2>
 
-          <section class="card p-4 shadow" style="width: 350px;">
-
-
-            <h2>Welcome Back!</h2>
-
-
-            <form id="login-form" action="#">
-
+<form id="login-form">
                 <fieldset>
-                    
-                    <legend>Secure Login</legend>
+<legend>Secure Login</legend>
+ 
+<label for="email" class="form-label">Email Address</label>
 
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" required>
+          
+<input type="email" id="email" class="form-control" required>
 
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required minlength="8">
+<label for="password" class="form-label mt-3">Password</label>
 
+                <input type="password" id="password" class="form-control" required minlength="8">
 
-                    <button type="submit" id="login">  Log In </button>
+             
+                <button type="submit" id="login" class="btn btn-primary w-100 mt-3"> Log In </button>
+</fieldset>
 
-                
-                </fieldset>
+<div id="message-container" class="mt-3 text-center"></div>
+</form>
 
-                <div id="message-container"></div>
+</section>
+  
+</main>
 
-
-            </form>
-
-
-        </section>
-
-    </main>
-
-    <script src="login.js" defer></script>
-
+  <script src="login.js" defer></script>
 
 </body>
 </html>
