@@ -741,21 +741,6 @@ try {
  * @param int   $statusCode  HTTP status code (default: 200).
  */
 function sendResponse($data, $statusCode = 200) {
-    // TODO: Set the HTTP status code using http_response_code()
-
-    // TODO: Ensure $data is an array; if not, wrap it
-
-    // TODO: Echo json_encode($data) and call exit
-}
-
-
-/**
- * Helper: Validate a URL string.
- * 
- * @param  string $url
- * @return bool  True if the URL passes FILTER_VALIDATE_URL, false otherwise.
- */
-function validateUrl($url) {
    http_response_code($statusCode);
 
     if (!is_array($data)) {
@@ -766,6 +751,18 @@ function validateUrl($url) {
     echo json_encode($data);
 
     exit;
+}
+
+
+/**
+ * Helper: Validate a URL string.
+ * 
+ * @param  string $url
+ * @return bool  True if the URL passes FILTER_VALIDATE_URL, false otherwise.
+ */
+function validateUrl($url) {
+    return filter_var($url, FILTER_VALIDATE_URL) !== false;
+
 }
 
 
