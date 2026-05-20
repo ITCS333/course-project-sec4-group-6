@@ -1,5 +1,4 @@
 var resources = [];
-window.resources = resources;
 const resourceForm = document.querySelector("#resource-form");
 const resourcesTbody = document.querySelector("#resources-tbody");
 
@@ -34,11 +33,11 @@ function createResourceRow(resource) {
 
 function renderTable() {
 
-   resourcesTbody.innerHTML = "";
+  resourcesTbody.innerHTML = "";
 
-  resources = window.resources || resources;
+  const data = window.resources || resources;
 
-  resources.forEach(resource => {
+  data.forEach(resource => {
 
     const row = createResourceRow(resource);
 
