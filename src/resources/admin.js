@@ -1,5 +1,4 @@
-let resources = [];
-
+var resources = [];
 const resourceForm = document.querySelector("#resource-form");
 const resourcesTbody = document.querySelector("#resources-tbody");
 
