@@ -96,15 +96,19 @@ function handleLogin(event) {
         displayMessage("Invalid email format.", "error");
         return;
     }
-  if (!isValidPassword(password)) {
+
+    if (!isValidPassword(password)) {
         displayMessage("Password must be at least 8 characters.", "error");
         return;
     }
 
     displayMessage("Login successful!", "success");
 
-    emailInput.value = "";
-    passwordInput.value = "";
+    if (email === "admin@uob.edu.bh") {
+        window.location.href = "../../dashboard.html";
+    } else {
+        window.location.href = "../../index.html";
+    }
 }
 
 /**
