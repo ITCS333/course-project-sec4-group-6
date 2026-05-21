@@ -86,8 +86,8 @@ function isValidPassword(password) {
  * - Call `displayMessage("Login successful!", "success")`.
  * - (Optional) Clear the email and password input fields.
  */
-function handleLogin(event) {
-    event.preventDefault();
+async function handleLogin(event) {
+event.preventDefault();
 
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
@@ -102,12 +102,33 @@ function handleLogin(event) {
         return;
     }
 
-    displayMessage("Login successful!", "success");
+    try {
+        const response = await fetch("api/index.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-    if (email === "admin@uob.edu.bh") {
-        window.location.href = "../../dashboard.html";
-    } else {
-        window.location.href = "../../index.html";
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            displayMessage(result.message || "Incorrect email or password.", "error");
+            return;
+        }
+
+        displayMessage("Login successful!", "success");
+
+        if (result.user.is_admin == 1) {
+            window.location.href = "../../dashboard.html";
+        } else {
+            window.location.href = "../../student_dashboard.html";
+        }
+
+    } catch (error) {
+        displayMessage("Login error. Please try again.", "error");
+        console.error(error);
     }
 }
 
