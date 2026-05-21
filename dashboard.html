@@ -7,35 +7,68 @@
 
   <title>Admin Dashboard</title>
 
-<link rel="stylesheet" href="assets/css/dashboard.css"></head>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+</head>
 
-<body>
+<body class="bg-light">
 
-  <h1>Admin Dashboard</h1>
+  <!-- Header -->
+  <header class="bg-dark text-white text-center py-3">
+    <h1 class="fw-bold">Admin Dashboard</h1>
+    <p class="mb-0">Manage course content and users</p>
+  </header>
 
-  <div class="dashboard">
+  <!-- Dashboard -->
+  <main class="container py-4">
 
-    <a href="src/admin/manage_users.html" class="card">
-      Manage Users
-    </a>
+    <div class="row g-3">
 
-    <a href="src/weekly/admin.html" class="card">
-      Manage Weekly
-    </a>
+      <div class="col-md-6 col-lg-4">
+        <a href="src/admin/manage_users.html" class="text-decoration-none">
+          <div class="card shadow border-0 rounded-4 text-center p-3 h-100">
+            <h5>Manage Users</h5>
+          </div>
+        </a>
+      </div>
 
-    <a href="src/assignments/admin.html" class="card">
-      Manage Assignments
-    </a>
+      <div class="col-md-6 col-lg-4">
+        <a href="src/weekly/admin.html" class="text-decoration-none">
+          <div class="card shadow border-0 rounded-4 text-center p-3 h-100">
+            <h5>Manage Weekly</h5>
+          </div>
+        </a>
+      </div>
 
-    <a href="src/resources/admin.html" class="card">
-      Manage Resources
-    </a>
+      <div class="col-md-6 col-lg-4">
+        <a href="src/assignments/admin.html" class="text-decoration-none">
+          <div class="card shadow border-0 rounded-4 text-center p-3 h-100">
+            <h5>Manage Assignments</h5>
+          </div>
+        </a>
+      </div>
 
-    <a href="src/discussion/board.html" class="card">
-      Discussion Board
-    </a>
+      <div class="col-md-6 col-lg-4">
+        <a href="src/resources/admin.html" class="text-decoration-none">
+          <div class="card shadow border-0 rounded-4 text-center p-3 h-100">
+            <h5>Manage Resources</h5>
+          </div>
+        </a>
+      </div>
 
-  </div>
+      <div class="col-md-6 col-lg-4">
+        <a href="src/discussion/board.html" class="text-decoration-none">
+          <div class="card shadow border-0 rounded-4 text-center p-3 h-100">
+            <h5>Discussion Board</h5>
+          </div>
+        </a>
+      </div>
+
+    </div>
+
+  </main>
 
 </body>
 
