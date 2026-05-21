@@ -87,7 +87,7 @@ function isValidPassword(password) {
  * - (Optional) Clear the email and password input fields.
  */
 function handleLogin(event) {
-    event.preventDefault();
+event.preventDefault();
 
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
@@ -102,12 +102,31 @@ function handleLogin(event) {
         return;
     }
 
-    displayMessage("Login successful!", "success");
+    try {
+        const response = await fetch("../../api/index.php?table=users");
+        const result = await response.json();
 
-    if (email === "admin@uob.edu.bh") {
-        window.location.href = "../../dashboard.html";
-    } else {
-        window.location.href = "../../index.html";
+        const users = result.data;
+
+        const user = users.find(function (u) {
+            return u.email === email && u.password === password;
+        });
+
+        if (!user) {
+            displayMessage("Invalid email or password.", "error");
+            return;
+        }
+
+        displayMessage("Login successful!", "success");
+
+        if (user.role === "admin") {
+            window.location.href = "../../dashboard.html";
+        } else {
+            window.location.href = "../../student_dashboard.html";
+        }
+
+    } catch (error) {
+        displayMessage("Error connecting to database.", "error");
     }
 }
 
