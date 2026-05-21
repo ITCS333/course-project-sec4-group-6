@@ -173,7 +173,7 @@ function handleAddUser(event) {
         return;
     }
 
-    fetch("../api/index.php", {
+    fetch("api/index.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -227,7 +227,7 @@ function handleTableClick(event) {
     if (target.classList.contains("delete-btn")) {
         const id = target.getAttribute("data-id");
 
-        fetch(`../api/index.php?id=${id}`, {
+        fetch(`api/index.php?id=${id}`, {
             method: "DELETE"
         })
         .then(res => {
@@ -253,7 +253,7 @@ function handleTableClick(event) {
         const newName = prompt("Enter new name:", user.name);
         if (!newName) return;
 
-        fetch("../api/index.php", {
+        fetch("api/index.php", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -370,9 +370,7 @@ function handleSort(event) {
  */
 async function loadUsersAndInitialize() {
     try {
-        const response = await fetch("../api/index.php");
-
-        if (!response.ok) {
+const response = await fetch("api/index.php");        if (!response.ok) {
             console.error("Error fetching users");
             alert("Error fetching users");
             return;
